@@ -44,9 +44,42 @@ https://github.com/openai/whisper
 ```bash
 git clone https://github.com/matusstas/openai-whisper-microservice.git
 cd openai-whisper-microservice
+
+# Optional: Configure environment variables
+cp server/.env.example server/.env
+# Edit server/.env with your preferred settings
+
+# Run with Docker Compose
 docker-compose up -d --build
 ```
 
+# Environment Variables
+
+The service supports the following environment variables:
+
+- `ENVIRONMENT`: Set to `development` to disable API key authentication or `production` (default) to enable it
+- `API_KEY`: Your custom API key to secure the API endpoints in production mode
+
+You can set these variables in three ways:
+
+1. Create a `.env` file in the server directory
+2. Pass them directly to docker-compose:
+   ```bash
+   ENVIRONMENT=development API_KEY=your-secret docker-compose up -d
+   ```
+3. Edit the docker-compose.yml file and set the values directly
+
+# API Authentication
+
+When running in production mode with an API key set, all endpoints require authentication with the `X-API-Key` header:
+
+```
+X-API-Key: your-secret-key-here
+```
+
+Authentication is automatically disabled when:
+- `ENVIRONMENT` is set to `development`, or
+- No `API_KEY` is provided in production mode
 
 # Docker Hub
 
@@ -64,7 +97,7 @@ https://hub.docker.com/r/matusstas/openai-whisper-microservice
 
 # Swagger API documentation
 
-After successfully starting the image, the Swagger documentation will be available at http://localhost:80/docs
+After successfully starting the image, the Swagger documentation will be available at http://localhost:10000/docs
 
 
 

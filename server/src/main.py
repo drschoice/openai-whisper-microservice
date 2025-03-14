@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.config import ENVIRONMENT, IS_DEVELOPMENT
+from src.middleware import APIKeyMiddleware
 from src.routes.model import router as Model
 from src.routes.language import router as Language
 from src.routes.miscellaneous import router as Miscellaneous
@@ -23,10 +25,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include router
-app.include_router(Model)
-app.include_router(Language)
-app.include_router(Miscellaneous)
+# Add API Key middleware (will only enforce for /api/ routes)
+app.add_middleware(APIKeyMiddleware) 
+
+# Include routers under /api prefix
+app.include_router(Model, prefix="/api")
+app.include_router(Language, prefix="/api")
+app.include_router(Miscellaneous, prefix="/api")
 
 
 @app.get("/", status_code=200, tags=["Root"])
@@ -34,4 +39,5 @@ async def root():
     """
     Return message from container to check if it is running.
     """
-    return {"detail":"Whisper API is running"}
+    env_info = f" (Environment: {ENVIRONMENT})"
+    return {"detail": f"Whisper API is running{env_info}"}

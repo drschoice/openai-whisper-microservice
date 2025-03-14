@@ -4,17 +4,11 @@ services:
       context: ./server
       dockerfile: ./Dockerfile
     ports:
-      - 80:80
+      - 10000:10000
     volumes:
       - models:/root/.cache/whisper
       - db:/app/db
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      - ./server/.env:/app/.env
 
 volumes:
   models:

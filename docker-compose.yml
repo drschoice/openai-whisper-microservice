@@ -1,13 +1,23 @@
 services:
   server:
+    restart: unless-stopped
     build:
       context: ./server
       dockerfile: ./Dockerfile
     ports:
-      - 80:80
+      - 10000:10000
     volumes:
       - models:/root/.cache/whisper
       - db:/app/db
+      - ./server/src:/app/src
+      - ./server/.env:/app/.env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
 volumes:
   models:
