@@ -127,6 +127,7 @@ async def transcribe_audio(model_name: str,
                            language_code: str = Form(..., enum=sorted(list(whisper.tokenizer.LANGUAGES.keys()))),
                            media_type: str = Form(..., enum=["application/json", "text/plain"]),
                            format: str = Form(..., enum=["json", "srt", "tsv", "txt", "vtt"]),
+                           is_zoom_audio: bool = Form(False),
                            file: UploadFile = File(...),
                            db = Depends(get_db)):
     """
@@ -140,7 +141,7 @@ async def transcribe_audio(model_name: str,
 
     model = whisper.load_model(model_name)
 
-    audio = load_audio(file)
+    audio = load_audio(file, is_zoom_audio=is_zoom_audio)
     options = {
         "task": task,
         "language": language_code,

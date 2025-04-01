@@ -14,17 +14,24 @@ def download(model_name: str, db):
     whisper.load_model(model_name)
     db.update({"downloaded": True}, Query().name == model_name)
 
+def get_zoom_raw_audio_options()-> dict:
+    return {
+        "ac": 1,
+        "ar": 32000,
+        "format": "s16le"
+    }
 
 # Modified
 # https://github.com/openai/whisper/blob/main/whisper/audio.py
-def load_audio(file: UploadFile, sr: int = 16000):
+def load_audio(file: UploadFile, sr: int = 16000, is_zoom_audio: bool = False):
     """
     Open an audio file object and read as mono waveform, resampling as necessary.
     """
     try:
+        print(sr)
         out, _ = (
-            ffmpeg.input("pipe:", threads=0)
-            .output("-", format="s16le", acodec="pcm_s16le", ac=1, ar=sr)
+            ffmpeg.input("pipe:", threads=0, **(get_zoom_raw_audio_options() if is_zoom_audio else {}))
+            .output("-", format="s16le", ar=sr, ac=1, acodec="pcm_s16le")
             .run(cmd=["ffmpeg", "-nostdin"], capture_stdout=True, capture_stderr=True, input=file.file.read())
         )
     except ffmpeg.Error as e:
